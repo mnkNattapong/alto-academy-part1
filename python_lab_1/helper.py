@@ -1,15 +1,18 @@
 import requests
 
 
-def get_weather_data(access_key: str, lat: str = "44.43", lon: str = "10.99"):
+def get_weather_data(access_key: str, lat: str = "13.7450255", lon: str = "100.5209932"):
     """ Get weather data from OpenWeatherMap API
+    default lat-lon is for MintTower building, Bangkok, Thailand
+    
+    Document
     OpenWeatherMap: https://openweathermap.org/
     API key page: https://home.openweathermap.org/api_keys
     Current-weather API: https://openweathermap.org/current
     Lat-Lon finder: https://openweathermap.org/api/geocoding-api
     """
     response = requests.get(url=f"https://api.openweathermap.org/data/2.5/weather/",
-                        data={
+                        params={
                             "lat": lat, 
                             "lon": lon, 
                             "appid": access_key
@@ -41,4 +44,7 @@ if __name__ == "__main__":
     # test `get_weather_data` function
     access_key = "15e396c7cce597f5f1f5c6277e3bf208"  # TODO: replace with your access key
     data = get_weather_data(access_key)
-    print(data.text)
+    print("Weather API's status code: ", data.status_code)
+    if data.status_code == 200:
+        print(type(data.json()))
+        print(data.json())
