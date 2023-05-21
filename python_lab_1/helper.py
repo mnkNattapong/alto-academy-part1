@@ -43,8 +43,19 @@ def send_line_notify(access_token: str, message: str):
 if __name__ == "__main__":
     # test `get_weather_data` function
     access_key = "15e396c7cce597f5f1f5c6277e3bf208"  # TODO: replace with your access key
-    data = get_weather_data(access_key)
+    data = get_weather_data(access_key, lat="3.7450255", lon="100.5209986")
     print("Weather API's status code: ", data.status_code)
     if data.status_code == 200:
-        print(type(data.json()))
-        print(data.json())
+        weather_data = data.json()
+        print(type(weather_data))
+        print(weather_data)
+        print()
+        print(weather_data.keys())
+        print()
+        print(weather_data["weather"][0]["main"])
+    
+    # test `send_line_notify` function
+    line_token = "IDOJs2SMCb9YAEFvguKacxExLBYWUIEXV8J4sF1C8Vn" # TODO: replace with your access token
+    send_line_notify(access_token=line_token, message="Hello world!") 
+    print("Done!")
+    
