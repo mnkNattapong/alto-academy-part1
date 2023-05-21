@@ -1,7 +1,7 @@
 {
-    "weather_access_key" : "15e396c7cce597f5f1f5c6277e3bf208",
-    "lat" : "3.7450255",
+    "weather_access_key" : "c098c02beca350bf40e4fcc3006b4f69",
+    "lat" : "13.7450255",
     "lon" : "100.5209986",
-    "line_notify_token" : "IDOJs2SMCb9YAEFvguKacxExLBYWUIEXV8J4sF1C8Vn",
-    "time_sleep" : 10
+    "line_notify_token" : "9mi8PJinVLNprxLOyd7YgOJ6pSpxsHm4MFmdvsVKkC4",
+    "time_sleep" : 14400
 }

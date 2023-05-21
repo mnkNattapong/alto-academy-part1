@@ -25,7 +25,7 @@ if __name__ == "__main__":
     time_sleep = json_config.get("time_sleep", 60*60) # unit: second
     weather_access_key = json_config.get("weather_access_key", "")
     line_notify_token = json_config.get("line_notify_token", "")
-    lat = json_config.get("lat", "3.7450255")
+    lat = json_config.get("lat", "13.7450255")
     lon = json_config.get("lon", "100.5209986")
     
     # error handling for config values
@@ -44,22 +44,39 @@ if __name__ == "__main__":
         
         # error handling for API response
         if request_data.status_code != 200:
+            print(weather_data['message'])
             time.sleep(int(time_sleep)) # unit : second
             continue
             
-        weather_data : dict =  request_data.json()
+        weather_data: dict =  request_data.json()
             
-        # select data from APT response
-        weather_condition = weather_data["weather"][0]["main"]
-        
-        # condition checking on the weather data
-        if weather_condition == "Clouds":
+        if request_data.status_code == 200:
+            # display appearance and description
+            appearance = weather_data["weather"][0]["main"]
+            description = weather_data["weather"][0]["description"]
+            
+            # display temperature
+            temp_kalvin = weather_data["main"]['temp']
+            temp = round(temp_kalvin - 273.15, 2)
+            
+            # displaty humidity
+            humidity = weather_data["main"]['humidity']
+            
+            # display wind speed
+            wind_speed = weather_data["wind"]['speed']
+            
             # construct message
-            print("constructing message")
-            message = f"Today's weather is {weather_condition}"
-    
+            message = f"\n \
+            The weather is {appearance}\n \
+            Temperature: {temp} °C\n \
+            Humidity: {humidity} %\n \
+            Wind Speed: {wind_speed} m/s \
+            "
+            print("The message is ", message)
+            
             # send Line notification through LINE Notify API
             send_line_notify(access_token=line_notify_token, message=message)
+            print("massage is sent")
         
         # add time sleep ex. 1 hour
         time.sleep(int(time_sleep)) # unit : second
