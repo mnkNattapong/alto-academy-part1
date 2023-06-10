@@ -1,17 +1,18 @@
 {
     "openmap_key": "daf8db3e543e16c6b679e86549dc887f",
-    "azure_openai_endpoint": "",
-    "azure_openai_key": "",
+    "azure_openai_endpoint": "https://alto-academy-openai.openai.azure.com/",
+    "azure_openai_key": "5a80ea1f802b493182aa5fc6c4953cd7",
+    "azure_openai_api_version": "2023-03-15-preview",
     "map_locations": [
         {
             "name": "Home",
-            "lat": 51.5074,
-            "lon": 0.1278
+            "lat": 13.7261773,
+            "lon": 100.5095148
         },
         {
             "name": "Work",
-            "lat": 51.5074,
-            "lon": 0.1278
+            "lat": 13.7450255,
+            "lon": 100.5209932
         }
     ]
 }
