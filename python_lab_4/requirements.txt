@@ -1,0 +1,2 @@
+# add required python packages here
+# command: `pip freeze > requirements.txt`
