@@ -1,5 +1,5 @@
-# alto-academy-part1
+# Alto AIoT Academy Part 1
 
-This is the repository that includes all python projects in each class. The explaination of each project is explained in each folder.
+This repository includes all python projects with the explanation in each class for each folder.
 
 Also, the summary of each class is written in Wiki.
