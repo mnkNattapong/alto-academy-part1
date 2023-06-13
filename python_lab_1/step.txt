@@ -1,0 +1,6 @@
+1. try helper functions: get weather data, send line notify
+2. create config file: list all config --> write
+3. read config file
+4. write main app
+5. test
+6. update repository
