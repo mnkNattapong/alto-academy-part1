@@ -21,37 +21,63 @@ def read_config(json_path: str) -> dict:
 
 def main_process(iot_queue, openmap_key: str, map_locations: list, delay: int = 60):
     print('start IoT data collection (Main) process')
-    # wriet main process to collect multiple IoT data ex. weather data API
+    # write main process to collect multiple IoT data ex. weather data API
     while True:
         weather_data = list()
         for map_location in map_locations:
             # TODO: apply Threading to support multiple API calls at the same time (later)
             # TODO: request Weather data from API
-            pass
+            
+            response = get_weather_data(access_key=openmap_key,
+                                        lat=map_location.get("lat", "13.7450255"),
+                                        lon=map_location.get("lon", "100.5209932"))
+            if response.status_code != 200:
+                continue
             
             # TODO: prepare data format for IoT-Queue
-        
+            _weather_data = response.json()
+            weather_condition = _weather_data['weather'][0]['main']
+            temperature_K = _weather_data['main']['temp']
+            temperature_C = round(temperature_K - 273.15, 2)
+            humidity = _weather_data['main']['humidity']
+            weather_data.append({
+                "name": map_location.get("name", "Unknown"),
+                "weather_condition": weather_condition,
+                "temperature": temperature_C,
+                "humidity": humidity
+            })
+            
         # TODO: insert IoT data to Queue
-        
+        iot_queue.put(weather_data)
         time.sleep(delay)
 
-def LLM_process(iot_queue, llm_result_queue, json_config: dict, MAX_LLM_QUEUE_SIZE: int = 50):
-    # write sub process to inference LLM model
+def LLM_process(iot_queue,
+                llm_result_queue,
+                json_config: dict, MAX_LLM_QUEUE_SIZE: int = 50):
+    # TODO: sub process to inference LLM model
     print('start LLM process')
     while True:
         try:
-            # TODO: get IoT data from Queue
-            weather_datas = None  # edit here
+            weather_datas: list = iot_queue.get()
             
             if weather_datas is None:
                 continue
             
             if len(weather_datas) > 0:
-                # TODO: inference LLM model
-                pass
+                gpt_response, _ = inference_llm(json_config, weather_datas)
                 
-                # TODO: insert LLM result to Queue
-                # TODO: handle `llm_result_queue` Queue size to prevent memory leak (later)
+                # insert LLM result to Queue
+                # TODO: handle llm_result_queue Queue size to prevent memory leak
+                _now = pendulum.now(tz="Asia/Bangkok")
+                llm_result = {
+                    "weather_datas": weather_datas,
+                    "gpt_response": gpt_response,
+                    "timestamp": _now.to_atom_string(),
+                    "unix_timestamp": _now.timestamp()
+                }
+                llm_result_queue.put(llm_result)
+            
+            time.sleep(1)
 
         except Exception as e:
             print("LLM_process: ", e)
@@ -61,8 +87,8 @@ def interface_process(llm_result_queue):
     
     def _get_current_analytics(chat_history):
         llm_result = dict()
-        # TODO: get latest LLM-response data from LLM-Queue
-        
+        while not llm_result_queue.empty():
+            llm_result: dict = llm_result_queue.get()
         
         if len(llm_result) == 0:
             return chat_history + [[None, "Jarvis: There is no data yet or the latest weather analysis is already shown."]]
@@ -89,7 +115,7 @@ def interface_process(llm_result_queue):
     demo.launch(
         server_name="0.0.0.0", 
         server_port=7860,
-        # auth=("username", "password")  # add authentication to UI
+        auth=("alto", "academy")  # add authentication to UI
         )
 
 if __name__ == "__main__":
@@ -114,11 +140,26 @@ if __name__ == "__main__":
     llm_result_queue = Queue()  # transfer LLM result from LLM process to interface process
     
     # TODO: declare LLM process
+    process_llm = Process(target=LLM_process,
+                          args=(iot_queue, 
+                                llm_result_queue, 
+                                json_config))
     
     # TODO: declare interface process
-    
+    process_interface = Process(target=interface_process,
+                                args=(llm_result_queue,))
+                                
     # TODO: start each process
+    process_llm.start()
+    process_interface.start()
     
     # TODO: run main process to collect IoT data
+    main_process(iot_queue,
+                 openmap_key,
+                 map_locations,
+                 delay=30)
     
     # TODO: join/stop each process
+    process_llm.join()
+    process_interface.join()
+    
